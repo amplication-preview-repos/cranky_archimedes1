@@ -1,0 +1,105 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Bus {
+  busNumber     String?
+  capacity      Int?
+  createdAt     DateTime @default(now())
+  driverName    String?
+  id            String   @id @default(cuid())
+  licenseNumber String?
+  route         Route?   @relation(fields: [routeId], references: [id])
+  routeId       String?
+  station       Station? @relation(fields: [stationId], references: [id])
+  stationId     String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Route {
+  buses       Bus[]
+  createdAt   DateTime @default(now())
+  destination String?
+  duration    String?
+  id          String   @id @default(cuid())
+  price       Float?
+  routeName   String?
+  source      String?
+  station     Station? @relation(fields: [stationId], references: [id])
+  stationId   String?
+  tickets     Ticket[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Ticket {
+  createdAt    DateTime  @default(now())
+  fullName     String?
+  id           String    @id @default(cuid())
+  journeyDate  DateTime?
+  phoneNumber  String?
+  price        Float?
+  route        Route?    @relation(fields: [routeId], references: [id])
+  routeId      String?
+  seatNumber   String?
+  station      Station?  @relation(fields: [stationId], references: [id])
+  stationId    String?
+  ticketNumber String?
+  updatedAt    DateTime  @updatedAt
+  vehicle      String?
+}
+
+model Passenger {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model Driver {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model Station {
+  buses             Bus[]
+  createdAt         DateTime           @default(now())
+  id                String             @id @default(cuid())
+  location          String?
+  routes            Route[]
+  stationExitPapers StationExitPaper[]
+  stationName       String?
+  tickets           Ticket[]
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+}
+
+model StationExitPaper {
+  createdAt     DateTime  @default(now())
+  driverName    String?
+  exitDate      DateTime?
+  id            String    @id @default(cuid())
+  licenseNumber String?
+  station       Station?  @relation(fields: [stationId], references: [id])
+  stationId     String?
+  updatedAt     DateTime  @updatedAt
+  vehicle       String?
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  station   Station? @relation(fields: [stationId], references: [id])
+  stationId String?
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
